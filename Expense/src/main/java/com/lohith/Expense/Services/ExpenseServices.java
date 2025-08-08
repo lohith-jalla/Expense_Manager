@@ -1,24 +1,25 @@
 package com.lohith.Expense.Services;
 
-import com.lohith.Expense.Dto.MonthlyExpenseDto;
 import com.lohith.Expense.Dto.PatchUpdateDto;
 import com.lohith.Expense.Model.Expense;
 import com.lohith.Expense.Model.ExpenseType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 public interface ExpenseServices {
      boolean validateToken(String Header);
-     List<Expense> getExpensesByUserId(long id);
+     Page<Expense> getExpensesByUserId(long id, Pageable pageable);
      Expense getExpenseByUserIdAndExpenseId(Long userId, Long expenseId);
      Expense createExpense(Expense expense, Long userId);
      Expense updateExpense(PatchUpdateDto expense, Long userId, Long expenseId);
      boolean deleteExpense(Long expenseId,Long userId);
-     List<MonthlyExpenseDto> getMonthlyProgress(Long userId, Long period);
+     Page<Object> getMonthlyProgress(Long userId, Long period, Pageable pageable);
      Map<ExpenseType, Double> getExpenseSummaryByType(Long userId, LocalDate startDate, LocalDate endDate);
      Map<String, Double> getMonthlySummary(Long userId, int year);
-     List<Object> searchExpenses(String query, Long userId);
-     List<Object> searchExpensesByType(ExpenseType type,Long userId);
+     Page<Object> searchExpenses(String query, Long userId,Pageable pageable);
+     Collection<Object> searchExpensesByType(ExpenseType type, Long userId);
 }

@@ -7,13 +7,16 @@ import com.lohith.Expense.Model.ExpenseType;
 import com.lohith.Expense.Services.ServiceImpl.ExpenseServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 
 @RestController()
@@ -26,9 +29,12 @@ public class ExpenseController {
 
     // Advanced Api for filters and other Features.
 
+    // Added Pagination
     @GetMapping("/search")
-    public ResponseEntity<List<Object>> searchExpenses(
+    public ResponseEntity<Page<Object>> searchExpenses(
             @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
             @RequestHeader("Authorization") String header
     ) {
         if (!expenseServiceImpl.validateToken(header)) {
@@ -36,21 +42,25 @@ public class ExpenseController {
         }
 
         Long userId= expenseServiceImpl.extractUserId(header);
-        List<Object> result = expenseServiceImpl.searchExpenses(query, userId);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending());
+        Page<Object> result = expenseServiceImpl.searchExpenses(query, userId,pageable);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/progress")
-    public ResponseEntity<List<MonthlyExpenseDto>> getMonthlyExpense(
+    public ResponseEntity<Page<Object>> getMonthlyExpense(
             @RequestParam Long period,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
             @RequestHeader("Authorization") String header
     ){
         if (!expenseServiceImpl.validateToken(header)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        Pageable pageable=PageRequest.of(page,size,Sort.by("date").descending());
         Long userId= expenseServiceImpl.extractUserId(header);
-        return new ResponseEntity<>(expenseServiceImpl.getMonthlyProgress(userId,period),HttpStatus.OK);
+        return new ResponseEntity<>(expenseServiceImpl.getMonthlyProgress(userId,period,pageable),HttpStatus.OK);
     }
 
     @GetMapping("/summary/type")
@@ -84,8 +94,11 @@ public class ExpenseController {
     }
 
 
+    // Added Pagination
     @GetMapping()
-    public ResponseEntity<List<Expense>> getExpenseByUserId(
+    public ResponseEntity<Page<Expense>> getExpenseByUserId(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
             @RequestHeader("Authorization") String Header
     ){
         boolean isValidToken= expenseServiceImpl.validateToken(Header);
@@ -94,7 +107,8 @@ public class ExpenseController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         Long userId = expenseServiceImpl.extractUserId(Header);
-        return new ResponseEntity<>(expenseServiceImpl.getExpensesByUserId(userId),HttpStatus.OK);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending());
+        return new ResponseEntity<>(expenseServiceImpl.getExpensesByUserId(userId,pageable),HttpStatus.OK);
     }
 
     @GetMapping("/{expenseId}")

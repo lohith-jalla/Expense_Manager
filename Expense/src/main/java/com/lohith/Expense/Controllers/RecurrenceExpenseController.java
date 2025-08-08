@@ -5,11 +5,13 @@ import com.lohith.Expense.Model.RecurringExpense;
 import com.lohith.Expense.Services.ServiceImpl.ExpenseServiceImpl;
 import com.lohith.Expense.Services.ServiceImpl.RecurringExpenseServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/expense/RExpense/")
@@ -21,15 +23,18 @@ public class RecurrenceExpenseController {
 
 
     @GetMapping("")
-    public ResponseEntity<List<RecurringExpense>> getAllRecurringExpense(
+    public ResponseEntity<Page<RecurringExpense>> getAllRecurringExpense(
+            @RequestHeader(defaultValue = "0") int page,
+            @RequestHeader(defaultValue = "5") int size,
             @RequestHeader("Authorization") String header
     ){
         if (!expenseServiceImpl.validateToken(header)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC,"date"));
         Long userId= expenseServiceImpl.extractUserId(header);
-        return new ResponseEntity<>(recurringExpenseServiceImpl.getAllForUser(userId),HttpStatus.OK);
+        return new ResponseEntity<>(recurringExpenseServiceImpl.getAllForUser(userId,pageable),HttpStatus.OK);
     }
 
     @GetMapping("/{expenseId}")

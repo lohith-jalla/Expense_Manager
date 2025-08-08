@@ -6,10 +6,10 @@ import com.lohith.Expense.OpenFeignClients.UserClient;
 import com.lohith.Expense.Repo.RecurringExpenseRepo;
 import com.lohith.Expense.Services.RecurringExpenseServices;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -46,8 +46,8 @@ public class RecurringExpenseServiceImpl implements RecurringExpenseServices {
         return recurringRepo.save(rexpense);
     }
 
-    public List<RecurringExpense> getAllForUser(Long userId) {
-        return recurringRepo.findAllByUserId(userId);
+    public Page<RecurringExpense> getAllForUser(Long userId, Pageable pageable) {
+        return recurringRepo.findAllByUserId(userId,pageable);
     }
 
     public RecurringExpense getById(Long expenseId) {

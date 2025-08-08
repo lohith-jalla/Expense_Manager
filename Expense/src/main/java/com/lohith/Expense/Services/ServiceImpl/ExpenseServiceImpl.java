@@ -12,6 +12,9 @@ import com.lohith.Expense.Services.ExpenseServices;
 import com.lohith.Expense.Services.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -39,8 +42,8 @@ public class ExpenseServiceImpl implements ExpenseServices {
         return validToken;
     }
 
-    public List<Expense> getExpensesByUserId(long id){
-        return expenseRepo.findAllByUserId(id);
+    public Page<Expense> getExpensesByUserId(long id, Pageable pageable){
+        return expenseRepo.findAllByUserId(id,pageable);
     }
 
     public Long extractUserId(String Header){
@@ -83,11 +86,11 @@ public class ExpenseServiceImpl implements ExpenseServices {
     }
 
     // Get the Monthly Progress
-    public List<MonthlyExpenseDto> getMonthlyProgress(Long userId, Long period){
+    public Page<Object> getMonthlyProgress(Long userId, Long period, Pageable pageable){
         LocalDate today=LocalDate.now();
         LocalDate startDate=today.minusMonths(period);
 
-        List<Expense> expenses = expenseRepo.findExpensesAfter(userId, startDate);
+        List<Expense> expenses = expenseRepo.findExpensesAfter(userId, startDate,pageable);
 
         // Group by month
         Map<YearMonth, Double> grouped = expenses.stream()
@@ -97,7 +100,7 @@ public class ExpenseServiceImpl implements ExpenseServices {
                 ));
 
         // Convert to DTO
-        return grouped.entrySet().stream()
+        List<Object>  resultDto = grouped.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey()) // sort by month
                 .map(entry -> {
                     String monthName = entry.getKey().getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
@@ -106,6 +109,12 @@ public class ExpenseServiceImpl implements ExpenseServices {
                 })
                 .collect(Collectors.toList());
 
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), resultDto.size());
+
+        List<Object> pagedList = resultDto.subList(start, end);
+
+        return new PageImpl<>(pagedList, pageable, resultDto.size());
     }
 
     // Get the summary of total expense by type.
@@ -134,43 +143,47 @@ public class ExpenseServiceImpl implements ExpenseServices {
         return summary;
     }
 
-    public List<Object> searchExpenses(String query, Long userId) {
-
-        // All Expenses with full name in name fields for both normal expense and recurring expense.
-        // Ensures All expenses are searched with name as our query
-        List<Expense> expenses = expenseRepo.findByNameIgnoreCaseAndUserId(query,userId);
-        List<RecurringExpense> recurringExpenses = recurringRepo.findByNameIgnoreCaseAndUserId(query,userId);
-
-        // Add them to the AllExpenses list
+    public Page<Object> searchExpenses(String query, Long userId, Pageable pageable) {
         List<Object> allExpenses = new ArrayList<>();
+
+        // Exact name match
+        List<Expense> expenses = expenseRepo.findByNameIgnoreCaseAndUserId(query, userId);
+        List<RecurringExpense> recurringExpenses = recurringRepo.findByNameIgnoreCaseAndUserId(query, userId);
+
         allExpenses.addAll(expenses);
         allExpenses.addAll(recurringExpenses);
 
-        // Search for parts of name which is equals to our query from both expense and recurring expense.
-        // Ensures all expenses are covered even if the query is part of the name field.
-        expenses.addAll(expenseRepo.findByNameIgnoreCaseContainingAndUserId(query,userId));
-        recurringExpenses.addAll(recurringRepo.findByNameIgnoreCaseContainingAndUserId(query,userId));
+        // Partial name match
+        expenses = (List<Expense>) expenseRepo.findByNameIgnoreCaseContainingAndUserId(query, userId);
+        recurringExpenses = (List<RecurringExpense>) recurringRepo.findByNameIgnoreCaseContainingAndUserId(query, userId);
 
+        allExpenses.addAll(expenses);
+        allExpenses.addAll(recurringExpenses);
+
+        // Type match
         boolean isValid = EnumUtils.isValidEnum(ExpenseType.class, query.toUpperCase());
-        if(isValid)
-            allExpenses.addAll(
-                    searchExpensesByType(ExpenseType.valueOf(query.toUpperCase()),userId));
-        return allExpenses;
+        if (isValid) {
+            allExpenses.addAll(searchExpensesByType(ExpenseType.valueOf(query.toUpperCase()), userId));
+        }
+
+        // 🧠 Remove duplicates (optional but recommended)
+        List<Object> distinctExpenses = allExpenses.stream()
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 🧮 Manual pagination
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), distinctExpenses.size());
+
+        List<Object> pagedList = distinctExpenses.subList(start, end);
+
+        return new PageImpl<>(pagedList, pageable, distinctExpenses.size());
     }
 
-    public List<Object> searchExpensesByType(ExpenseType type,Long userId) {
-        List<Expense> expenses =expenseRepo.findByTypeAndUserId(type,userId);
-        List<RecurringExpense> recurringExpenses=recurringRepo.findByTypeAndUserId(type,userId);
-
-        List<Object> allExpenses = new ArrayList<>();
-        allExpenses.addAll(expenses);
-        allExpenses.addAll(recurringExpenses);
-
-        return allExpenses;
+    @Override
+    public Collection<Object> searchExpensesByType(ExpenseType type, Long userId) {
+        return expenseRepo.findAllByTypeAndUserId(type,userId);
     }
-
-
-
 
 
 }
