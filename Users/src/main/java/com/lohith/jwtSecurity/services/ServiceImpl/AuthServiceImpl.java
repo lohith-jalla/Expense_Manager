@@ -46,6 +46,7 @@ public class AuthServiceImpl implements AuthServices {
                 .builder()
                 .userName(req.getUsername())
                 .password(passwordEncoder.encode(req.getPassword()))
+                .email(req.getMail())
                 .build()
         );
 

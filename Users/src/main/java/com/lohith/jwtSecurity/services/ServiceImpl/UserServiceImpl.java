@@ -26,5 +26,30 @@ public class UserServiceImpl implements UserServices {
         return userRepo.findById(id).orElse(null);
     }
 
+    @Override
+    public boolean setLimit(String token, Double limit) {
+        String username=authUtil.getUserNameFromToken(token);
+        User user=userRepo.findByUserName(username).orElse(null);
+        System.out.println(user.getUsername());
+
+        if(user==null){
+            return false;
+        }
+        user.setMonthlyLimit(limit);
+        userRepo.save(user);
+        return true;
+    }
+
+    @Override
+    public boolean setMail(String token, String mail) {
+        String username=authUtil.getUserNameFromToken(token);
+        User user=userRepo.findByUserName(username).orElse(null);
+        if(user==null){
+            return false;
+        }
+        user.setEmail(mail);
+        userRepo.save(user);
+        return true;
+    }
 
 }

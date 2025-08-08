@@ -29,9 +29,15 @@ public class User implements UserDetails {
     @NotNull
     private String userName;
 
+    private String email;
+
     private String password;
 
     private List<Long> expenses;
+
+    private Double monthlyLimit;
+
+    private Integer lastLimitAlertMonth;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -46,5 +46,58 @@ public class UserController {
         }
     }
 
+    @PostMapping("/setLimit/{limit}")
+    public ResponseEntity<String> setLimit(
+            @PathVariable("limit") Double limit,
+            @RequestHeader("Authorization") String header
+    ){
+        if(header==null || !header.startsWith("Bearer ")){
+            System.out.println("null token");
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        String token =  header.substring(7);
+        boolean isValid= userServiceImpl.validateToken(header);
+
+        if(isValid){
+            Boolean done= userServiceImpl.setLimit(token,limit);
+            if (done) {
+                return new  ResponseEntity<>("Limit Set Success", HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+
+    @PostMapping("/setMail")
+    public ResponseEntity<String> setMail(
+            @RequestParam("mail") String mail,
+            @RequestHeader("Authorization") String header
+    ){
+        if(header==null || !header.startsWith("Bearer ")){
+            System.out.println("null token");
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        String token =  header.substring(7);
+        boolean isValid= userServiceImpl.validateToken(header);
+
+        if(isValid){
+            Boolean done= userServiceImpl.setMail(token,mail);
+            if (done) {
+                return new  ResponseEntity<>("Email Set Success", HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
 
 }
