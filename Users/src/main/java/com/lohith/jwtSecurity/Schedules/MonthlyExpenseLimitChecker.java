@@ -21,7 +21,7 @@ public class MonthlyExpenseLimitChecker {
 
     private final ExpenseClient expenseClient;
     private final JavaMailSender javaMailSender;
-    private final AuthUtil jwtService;
+    private final AuthUtil authUtil;
     private final UserRepo userRepository;
 
 
@@ -36,7 +36,7 @@ public class MonthlyExpenseLimitChecker {
             Double limit = user.getMonthlyLimit();
             if (limit == null) continue;
 
-            String token = jwtService.generateAccessToken(user);
+            String token = authUtil.generateAccessToken(user);
             String authHeader = "Bearer " + token;
 
             try {
