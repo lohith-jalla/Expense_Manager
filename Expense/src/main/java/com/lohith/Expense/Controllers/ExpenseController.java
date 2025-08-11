@@ -4,19 +4,25 @@ import com.lohith.Expense.Dto.MonthlyExpenseDto;
 import com.lohith.Expense.Dto.PatchUpdateDto;
 import com.lohith.Expense.Model.Expense;
 import com.lohith.Expense.Model.ExpenseType;
+import com.lohith.Expense.Services.ExportService;
 import com.lohith.Expense.Services.ServiceImpl.ExpenseServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -26,6 +32,7 @@ import java.util.Map;
 public class ExpenseController {
 
     private final ExpenseServiceImpl expenseServiceImpl;
+    private final ExportService exportService;
 
 
     // Advanced Api for filters and other Features.
@@ -92,6 +99,29 @@ public class ExpenseController {
         Long userId= expenseServiceImpl.extractUserId(header);
         Map<String, Double> summary = expenseServiceImpl.getMonthlySummary(userId, year);
         return ResponseEntity.ok(summary);
+    }
+
+    // Export Expenses to Excel sheet
+    @GetMapping("/export/excel")
+    public ResponseEntity<InputStreamResource> exportExpenses(
+            @RequestHeader("Authorization") String header
+    ) throws IOException {
+
+        if (!expenseServiceImpl.validateToken(header)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long userId= expenseServiceImpl.extractUserId(header);
+
+        ByteArrayInputStream excelData = exportService.exportExpensesToExcel(userId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=expenses.xlsx");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(new InputStreamResource(excelData));
     }
 
 
