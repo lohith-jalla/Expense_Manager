@@ -1,6 +1,7 @@
 package com.lohith.Expense.Dto;
 
 import com.lohith.Expense.Model.ExpenseType;
+import com.lohith.Expense.Model.PaymentType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,4 +14,5 @@ public class PatchUpdateDto {
     private Double amount;
     private String description;
     private ExpenseType type;
+    private PaymentType paymentType;
 }

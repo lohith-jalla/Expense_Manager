@@ -2,6 +2,7 @@ package com.lohith.Expense.Dto;
 
 
 import com.lohith.Expense.Model.ExpenseType;
+import com.lohith.Expense.Model.RecurringStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,5 +20,6 @@ public class RecurringExpenseRequestDto {
     private Double amount;
     private String frequency;
     private ExpenseType type;
+    private RecurringStatus status;
     private LocalDate startDate;
 }

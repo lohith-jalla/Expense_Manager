@@ -26,6 +26,7 @@ public class RecurringExpense {
     private String description;
     private ExpenseType type;
     private String frequency;
+    private RecurringStatus status;
     private LocalDate startDate;
     private Long userId;
 }

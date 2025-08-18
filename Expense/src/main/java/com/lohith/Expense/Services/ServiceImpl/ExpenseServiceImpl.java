@@ -69,6 +69,7 @@ public class ExpenseServiceImpl implements ExpenseServices {
             if(expense.getDescription()!=null) expenseToBeUpdated.setDescription(expense.getDescription());
             if(expense.getName()!=null) expenseToBeUpdated.setName(expense.getName());
             if(expense.getType()!=null) expenseToBeUpdated.setType(expense.getType());
+            if(expense.getPaymentType()!=null) expenseToBeUpdated.setPaymentType(expense.getPaymentType());
             expenseRepo.save(expenseToBeUpdated);
 
             return expenseToBeUpdated;

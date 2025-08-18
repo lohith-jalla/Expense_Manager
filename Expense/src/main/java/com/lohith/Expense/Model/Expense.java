@@ -20,6 +20,7 @@ public class Expense {
     private Double amount;
     private String description;
     private ExpenseType type;
+    private PaymentType paymentType;
     private LocalDate date;
     private Long userId;
 }

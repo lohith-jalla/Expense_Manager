@@ -1,6 +1,5 @@
 package com.lohith.Expense.Controllers;
 
-import com.lohith.Expense.Dto.MonthlyExpenseDto;
 import com.lohith.Expense.Dto.PatchUpdateDto;
 import com.lohith.Expense.Model.Expense;
 import com.lohith.Expense.Model.ExpenseType;
@@ -13,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -186,6 +184,7 @@ public class ExpenseController {
             return ResponseEntity.ok(UpdatedExpense);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
     }
 
     @DeleteMapping("/{expenseId}")

@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/expense/RExpense/")
+@RequestMapping("/expense/RExpense")
 @RequiredArgsConstructor
 public class RecurrenceExpenseController {
 
@@ -22,7 +22,7 @@ public class RecurrenceExpenseController {
     private final ExpenseServiceImpl expenseServiceImpl;
 
 
-    @GetMapping("")
+    @GetMapping()
     public ResponseEntity<Page<RecurringExpense>> getAllRecurringExpense(
             @RequestHeader(defaultValue = "0") int page,
             @RequestHeader(defaultValue = "5") int size,
@@ -32,7 +32,7 @@ public class RecurrenceExpenseController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC,"date"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC,"startDate"));
         Long userId= expenseServiceImpl.extractUserId(header);
         return new ResponseEntity<>(recurringExpenseServiceImpl.getAllForUser(userId,pageable),HttpStatus.OK);
     }

@@ -26,6 +26,8 @@ public class RecurringExpenseServiceImpl implements RecurringExpenseServices {
                 .description(dto.getDescription())
                 .frequency(dto.getFrequency())
                 .startDate(dto.getStartDate())
+                .status(dto.getStatus())
+                .type(dto.getType())
                 .userId(userId)
                 .build();
         return recurringRepo.save(exp);
@@ -41,6 +43,7 @@ public class RecurringExpenseServiceImpl implements RecurringExpenseServices {
         rexpense.setDescription(expense.getDescription());
         rexpense.setAmount(expense.getAmount());
         rexpense.setFrequency(expense.getFrequency());
+        rexpense.setStatus(expense.getStatus());
         rexpense.setStartDate(expense.getStartDate());
 
         return recurringRepo.save(rexpense);
