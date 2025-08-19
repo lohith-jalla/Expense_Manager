@@ -168,7 +168,7 @@ public class ExpenseController {
         return new ResponseEntity<>(expenseServiceImpl.createExpense(expense,userId),HttpStatus.CREATED);
     }
 
-    @PatchMapping("/{expenseId}")
+    @PutMapping("/{expenseId}")
     public ResponseEntity<Expense> updateExpense(
             @RequestHeader("Authorization") String header,
             @PathVariable("expenseId") Long  expenseId,

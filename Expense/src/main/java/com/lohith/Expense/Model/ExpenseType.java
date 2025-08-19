@@ -11,5 +11,8 @@ public enum ExpenseType {
     COMMON_EXPENSE ,
     HOME_DECOR ,
     ACCESSORIES,
-    RENT
+    RENT,
+    TRAVEL,
+    BUSINESS ,
+    OTHER
 }
