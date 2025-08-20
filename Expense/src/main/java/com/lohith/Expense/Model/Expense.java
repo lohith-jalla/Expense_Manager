@@ -19,8 +19,13 @@ public class Expense {
     private String name;
     private Double amount;
     private String description;
+
+    @Enumerated(EnumType.STRING)
     private ExpenseType type;
+
+    @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
+
     private LocalDate date;
     private Long userId;
 }

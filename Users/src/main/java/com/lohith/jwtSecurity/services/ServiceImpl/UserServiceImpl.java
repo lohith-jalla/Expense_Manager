@@ -52,4 +52,10 @@ public class UserServiceImpl implements UserServices {
         return true;
     }
 
+    @Override
+    public Long getUserId(String token) {
+        token = token.substring(7);
+        return authUtil.getUserIdFromToken(token);
+    }
+
 }

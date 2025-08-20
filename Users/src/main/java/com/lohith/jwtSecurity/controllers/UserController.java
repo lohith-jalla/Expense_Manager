@@ -1,5 +1,6 @@
 package com.lohith.jwtSecurity.controllers;
 
+import com.lohith.jwtSecurity.dto.ProfileDto;
 import com.lohith.jwtSecurity.model.User;
 import com.lohith.jwtSecurity.services.ServiceImpl.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -12,22 +13,40 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
-
-
     private final UserServiceImpl userServiceImpl;
 
-    @GetMapping("/{id}")
+    @GetMapping("")
     public ResponseEntity<User> getUser(
-            @RequestHeader("Authorization") String token,
-            @PathVariable("id") Long id
+            @RequestHeader("Authorization") String token
     ) {
         boolean isValid= userServiceImpl.validateToken(token);
 
+        long userId=userServiceImpl.getUserId(token);
         if(isValid){
-            User user= userServiceImpl.getUserById(id);
+            User user= userServiceImpl.getUserById(userId);
             return new  ResponseEntity<>(user, HttpStatus.OK);
         }
         else{
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @GetMapping("/getProfile")
+    public ResponseEntity<ProfileDto> getProfile(
+            @RequestHeader("Authorization") String token
+    ){
+        boolean isValid = userServiceImpl.validateToken(token);
+
+        if(isValid){
+            Long id=userServiceImpl.getUserId(token);
+            User user=userServiceImpl.getUserById(id);
+            ProfileDto dto = ProfileDto.builder()
+                    .email(user.getEmail())
+                    .username(user.getUsername())
+                    .monthlyLimit(user.getMonthlyLimit())
+                    .build();
+            return new ResponseEntity<>(dto, HttpStatus.OK);
+        }else{
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }

@@ -8,4 +8,5 @@ public interface UserServices {
      User getUserById(Long id);
      boolean setLimit(String token,Double limit);
      boolean setMail(String token,String mail);
+     Long getUserId(String token);
 }

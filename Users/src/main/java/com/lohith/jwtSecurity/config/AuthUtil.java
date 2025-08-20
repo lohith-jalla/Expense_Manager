@@ -36,6 +36,10 @@ public class AuthUtil {
         return extractAllClaims(token).getSubject();
     }
 
+    public Long getUserIdFromToken(String token){
+        return Long.parseLong(extractAllClaims(token).get("userId",String.class));
+    }
+
     public Claims extractAllClaims(String token) {
         return Jwts
                 .parser()

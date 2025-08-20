@@ -43,6 +43,7 @@ public class RecurringExpenseServiceImpl implements RecurringExpenseServices {
         rexpense.setDescription(expense.getDescription());
         rexpense.setAmount(expense.getAmount());
         rexpense.setFrequency(expense.getFrequency());
+        rexpense.setPaymentType(expense.getPaymentType());
         rexpense.setStatus(expense.getStatus());
         rexpense.setStartDate(expense.getStartDate());
 

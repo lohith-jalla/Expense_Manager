@@ -1,10 +1,7 @@
 package com.lohith.Expense.Model;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,8 +21,17 @@ public class RecurringExpense {
     private String name;
     private Double amount;
     private String description;
+
+    @Enumerated(EnumType.STRING)
     private ExpenseType type;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentType paymentType;
+
+    @Enumerated(EnumType.STRING)
     private FrequencyType frequency;
+
+    @Enumerated(EnumType.STRING)
     private RecurringStatus status;
     private LocalDate startDate;
     private Long userId;
