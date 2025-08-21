@@ -28,6 +28,7 @@ public class RecurringExpenseServiceImpl implements RecurringExpenseServices {
                 .startDate(dto.getStartDate())
                 .status(dto.getStatus())
                 .type(dto.getType())
+                .paymentType(dto.getPaymentType())
                 .userId(userId)
                 .build();
         return recurringRepo.save(exp);
@@ -44,6 +45,7 @@ public class RecurringExpenseServiceImpl implements RecurringExpenseServices {
         rexpense.setAmount(expense.getAmount());
         rexpense.setFrequency(expense.getFrequency());
         rexpense.setPaymentType(expense.getPaymentType());
+        rexpense.setType(expense.getType());
         rexpense.setStatus(expense.getStatus());
         rexpense.setStartDate(expense.getStartDate());
 
@@ -60,7 +62,7 @@ public class RecurringExpenseServiceImpl implements RecurringExpenseServices {
 
     public boolean deleteWithPassword(Long recurringId, Long userId, String password , String token) {
         String storedHashedPassword = userClient.getHashedPassword("Bearer "+token,userId);
-
+        System.out.println(storedHashedPassword+"---"+passwordEncoder.encode(password)+"_----"+password);
         if (passwordEncoder.matches(password, storedHashedPassword)) {
             recurringRepo.deleteById(recurringId);
             return true;
