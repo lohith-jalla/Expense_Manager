@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Map;
+import java.time.Year;
 
 @RestController()
 @RequestMapping("/expense")
@@ -55,7 +56,7 @@ public class ExpenseController {
 
     @GetMapping("/progress")
     public ResponseEntity<Page<Object>> getMonthlyExpense(
-            @RequestParam Long period,
+            @RequestParam(defaultValue = "3") Long period,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestHeader("Authorization") String header
@@ -72,11 +73,19 @@ public class ExpenseController {
     @GetMapping("/summary/type")
     public ResponseEntity<Map<ExpenseType, Double>> getSummaryByType(
             @RequestHeader("Authorization") String header,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
         if (!expenseServiceImpl.validateToken(header)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (endDate == null) {
+            endDate = LocalDate.now();
+        }
+
+        if(startDate == null) {
+            startDate = LocalDate.now().minusMonths(1);
         }
 
         Long userId= expenseServiceImpl.extractUserId(header);
@@ -88,10 +97,14 @@ public class ExpenseController {
     @GetMapping("/monthly-summary")
     public ResponseEntity<Map<String, Double>> getMonthlySummary(
             @RequestHeader("Authorization") String header,
-            @RequestParam int year
+            @RequestParam(required = false) Integer year
     ) {
         if (!expenseServiceImpl.validateToken(header)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (year == null) {
+            year = Year.now().getValue();  // fallback to current year
         }
 
         Long userId= expenseServiceImpl.extractUserId(header);
@@ -99,7 +112,26 @@ public class ExpenseController {
         return ResponseEntity.ok(summary);
     }
 
+    @GetMapping("/weekly-summary")
+    public ResponseEntity<Map<String, Double>> getWeeklySummary(
+            @RequestHeader("Authorization") String header,
+            @RequestParam(required = false) Integer year
+    ) {
+        if (!expenseServiceImpl.validateToken(header)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if(year==null){
+            year=Year.now().getValue();
+        }
+
+        Long userId = expenseServiceImpl.extractUserId(header);
+        Map<String, Double> summary = expenseServiceImpl.getWeeklySummary(userId, year);
+        return ResponseEntity.ok(summary);
+    }
+
     // Export Expenses to Excel sheet
+    // Done implementing
     @GetMapping("/export/excel")
     public ResponseEntity<InputStreamResource> exportExpenses(
             @RequestHeader("Authorization") String header

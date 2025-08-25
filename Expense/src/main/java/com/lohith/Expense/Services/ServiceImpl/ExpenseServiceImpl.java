@@ -144,6 +144,19 @@ public class ExpenseServiceImpl implements ExpenseServices {
         return summary;
     }
 
+    public Map<String, Double> getWeeklySummary(Long userId, int year) {
+        List<Object[]> results = expenseRepo.getWeeklySummary(userId, year);
+
+        Map<String, Double> summary = new LinkedHashMap<>();
+        for (Object[] row : results) {
+            Integer week = ((Number) row[0]).intValue();
+            Double total = (Double) row[1];
+            summary.put("Week " + week, total);
+        }
+        return summary;
+    }
+
+
     public Page<Object> searchExpenses(String query, Long userId, Pageable pageable) {
         List<Object> allExpenses = new ArrayList<>();
 

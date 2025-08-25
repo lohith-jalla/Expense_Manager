@@ -22,4 +22,5 @@ public interface ExpenseServices {
      Map<String, Double> getMonthlySummary(Long userId, int year);
      Page<Object> searchExpenses(String query, Long userId,Pageable pageable);
      Collection<Object> searchExpensesByType(ExpenseType type, Long userId);
+     Map<String, Double> getWeeklySummary(Long userId, int year);
 }

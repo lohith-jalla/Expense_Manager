@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -39,6 +40,13 @@ public interface ExpenseRepo extends JpaRepository<Expense,Long> {
     List<Object[]> getMonthlySummary(Long userId, int year);
 
     List<Expense> findByNameIgnoreCaseAndUserId(String query, Long userId);
+
+    @Query("SELECT FUNCTION('WEEK', e.date), SUM(e.amount) " +
+            "FROM Expense e " +
+            "WHERE e.userId = :userId AND FUNCTION('YEAR', e.date) = :year " +
+            "GROUP BY FUNCTION('WEEK', e.date) " +
+            "ORDER BY FUNCTION('WEEK', e.date)")
+    List<Object[]> getWeeklySummary(Long userId, int year);
 
 
     List<Expense> findByTypeAndUserId(ExpenseType type, Long userId);
