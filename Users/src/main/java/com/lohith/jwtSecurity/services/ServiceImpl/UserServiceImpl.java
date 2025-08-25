@@ -58,4 +58,12 @@ public class UserServiceImpl implements UserServices {
         return authUtil.getUserIdFromToken(token);
     }
 
+    @Override
+    public Double getLimit(String token) {
+        Long id = authUtil.getUserIdFromToken(token);
+        User user=userRepo.findById(id).orElse(null);
+
+        return user.getMonthlyLimit()!=null ? user.getMonthlyLimit() : 0;
+    }
+
 }

@@ -58,7 +58,6 @@ public class ExpenseServiceImpl implements ExpenseServices {
 
     public Expense createExpense(Expense expense, Long userId) {
         expense.setUserId(userId);
-        expense.setDate(LocalDate.now());
         return expenseRepo.save(expense);
     }
 
@@ -70,6 +69,7 @@ public class ExpenseServiceImpl implements ExpenseServices {
             if(expense.getName()!=null) expenseToBeUpdated.setName(expense.getName());
             if(expense.getType()!=null) expenseToBeUpdated.setType(expense.getType());
             if(expense.getPaymentType()!=null) expenseToBeUpdated.setPaymentType(expense.getPaymentType());
+            if(expense.getDate()!=null) expenseToBeUpdated.setDate(expense.getDate());
             expenseRepo.save(expenseToBeUpdated);
 
             return expenseToBeUpdated;

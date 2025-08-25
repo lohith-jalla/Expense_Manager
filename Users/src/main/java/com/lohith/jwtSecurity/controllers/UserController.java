@@ -67,6 +67,23 @@ public class UserController {
         }
     }
 
+    @GetMapping("/getLimit")
+    public ResponseEntity<Double> getLimit(
+        @RequestHeader("Authorization") String header
+    ) {
+        if(header==null || !header.startsWith("Bearer ")){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        String token =  header.substring(7);
+        boolean isValid= userServiceImpl.validateToken(header);
+        if(isValid){
+            return new ResponseEntity<>(userServiceImpl.getLimit(token),HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
     @PostMapping("/setLimit/{limit}")
     public ResponseEntity<String> setLimit(
             @PathVariable("limit") Double limit,

@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -15,4 +17,5 @@ public class PatchUpdateDto {
     private String description;
     private ExpenseType type;
     private PaymentType paymentType;
+    private LocalDate date;
 }

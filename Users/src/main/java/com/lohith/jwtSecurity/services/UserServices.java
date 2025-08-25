@@ -9,4 +9,5 @@ public interface UserServices {
      boolean setLimit(String token,Double limit);
      boolean setMail(String token,String mail);
      Long getUserId(String token);
+     Double getLimit(String token);
 }
