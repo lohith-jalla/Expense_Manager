@@ -25,8 +25,7 @@ public class MonthlyExpenseLimitChecker {
     private final UserRepo userRepository;
 
 
-//    @Scheduled(cron = "0 0 9 * * Sun")
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 9 * * Sun")
     public void sendLimitAlerts() {
         System.out.println("Sending limit alerts to expense");
         List<User> users = userRepository.findAll();
@@ -47,8 +46,8 @@ public class MonthlyExpenseLimitChecker {
                 if (content != null && !content.isEmpty()) {
                     Double monthlyTotal = ((Number) content.get(0).get("total")).doubleValue();
 
-                    if (monthlyTotal > limit &&
-                            (user.getLastLimitAlertMonth() == null || user.getLastLimitAlertMonth() != currentMonth)) {
+                    if (monthlyTotal > limit){
+//                            (user.getLastLimitAlertMonth() == null || user.getLastLimitAlertMonth() != currentMonth)) {
 
                         sendEmail(user.getEmail(), monthlyTotal, limit,user.getUsername());
                         user.setLastLimitAlertMonth(currentMonth);
