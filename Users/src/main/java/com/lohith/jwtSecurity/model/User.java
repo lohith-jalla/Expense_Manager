@@ -39,6 +39,10 @@ public class User implements UserDetails {
 
     private Integer lastLimitAlertMonth;
 
+    private String provider;
+
+    private String provider_id_sub;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
